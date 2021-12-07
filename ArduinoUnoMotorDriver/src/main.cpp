@@ -32,21 +32,9 @@ extern void Stop();
 
 void setup()
 {
-    // Serial.begin(9600);
-    // OLED_INIT();
-    // MECANUM_WHEEL_INIT();
     MoveForward(0.75);
 }
 
 void loop()
 {
-
-    // MoveForward(0.75);
-    // delay(2000);
-    // Stop();
-    // while (1)
-    //    ;
-    // int i = analogRead(A0);
-    // Serial.println(i);
-    // delay(500);
 }

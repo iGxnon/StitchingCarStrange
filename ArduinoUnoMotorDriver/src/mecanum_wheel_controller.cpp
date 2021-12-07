@@ -26,6 +26,14 @@ typedef enum
     BACK,
 } DIRECTION;
 
+// 麦轮运动学公式
+#define _A_ 10
+#define _B_ 8
+#define V_LF_FORMAT (v_y - v_x + w * (_A_ + _B_)) * 1.0
+#define V_RF_FORMAT (v_y + v_x - w * (_A_ + _B_)) * 1.0
+#define V_LB_FORMAT (v_y + v_x + w * (_A_ + _B_)) * 1.0
+#define V_RB_FORMAT (v_y - v_x - w * (_A_ + _B_)) * 1.0
+
 void MECANUM_WHEEL_INIT()
 {
     digitalWrite(LF_FORWARD, LOW);
@@ -50,7 +58,7 @@ void move(int highIO, int lowIO, int pwmIO, float dutyRatio, int pwmInputIO)
     digitalWrite(highIO, HIGH);
     digitalWrite(lowIO, LOW);
     int pwmMax = analogRead(pwmInputIO);
-    analogWrite(pwmIO, (int)(dutyRatio * pwmMax));
+    analogWrite(pwmIO, map((int)(dutyRatio * pwmMax), 0, pwmMax, 0, 1023));
 }
 
 void MoveLF(DIRECTION direction, float speedPer)
@@ -122,7 +130,7 @@ void MoveBackward(float speedPer)
     MoveRB(BACK, speedPer);
 }
 
-void MoveLeft(float speedPer)
+void TurnLeft(float speedPer)
 {
     MoveLF(BACK, speedPer);
     MoveRF(FRONT, speedPer);
@@ -130,10 +138,49 @@ void MoveLeft(float speedPer)
     MoveRB(FRONT, speedPer);
 }
 
-void MoveRight(float speedPer)
+void MoveLeft(float speedPer)
+{
+    MoveLF(FRONT, speedPer);
+    MoveRF(BACK, speedPer);
+    MoveLB(BACK, speedPer);
+    MoveRB(FRONT, speedPer);
+}
+
+void TurnRight(float speedPer)
 {
     MoveLF(FRONT, speedPer);
     MoveRF(BACK, speedPer);
     MoveLB(FRONT, speedPer);
     MoveRB(BACK, speedPer);
+}
+
+void MoveRight(float speedPer)
+{
+    MoveLF(BACK, speedPer);
+    MoveRF(FRONT, speedPer);
+    MoveLB(FRONT, speedPer);
+    MoveRB(BACK, speedPer);
+}
+
+void MoveWithDelta(float v_x, float v_y, float w, float speedPer)
+{
+    float v[4] = {V_LF_FORMAT, V_RF_FORMAT, V_LB_FORMAT, V_RB_FORMAT};
+    float *iter = v;
+    float max_v = fabs(*iter);
+    while (iter < v + 4)
+    {
+        max_v = max(fabs(max_v), fabs(*iter));
+        iter++;
+    }
+    iter = v;
+    while (iter < v + 4)
+    {
+        *iter /= max_v;
+        *iter *= speedPer;
+        iter++;
+    }
+    MoveLF(v[0] > 0 ? FRONT : BACK, fabs(v[0]));
+    MoveRF(v[1] > 0 ? FRONT : BACK, fabs(v[1]));
+    MoveLB(v[2] > 0 ? FRONT : BACK, fabs(v[2]));
+    MoveRB(v[3] > 0 ? FRONT : BACK, fabs(v[3]));
 }
