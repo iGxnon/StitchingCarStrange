@@ -24,17 +24,100 @@ int RB_BACKWARD = 13;
 int RB_PWM = 11;
 int RB_PWM_HIGH_IN = A3;
 
-extern void OLED_INIT();
-extern void MECANUM_WHEEL_INIT();
-extern unsigned char *point;
-extern void MoveForward(float speedPer);
+typedef enum
+{
+    FRONT,
+    BACK,
+} DIRECTION;
+
+extern void
+MECANUM_WHEEL_INIT();
+
 extern void Stop();
+extern void MoveForward(float speedPer);
+extern void MoveBackward(float speedPer);
+extern void TurnLeft(float speedPer);
+extern void TurnRight(float speedPer);
+extern void MoveLeft(float speedPer);
+extern void MoveRight(float speedPer);
+
+extern void OLED_INIT();
+extern void ShowIP(String ip);
+extern void PrintSerial(String str);
+extern void HandleCmd(String cmd);
+extern void MoveBackForObstacles();
+extern void MoveX(DIRECTION dx, DIRECTION dy, float speedPer);
+
+void TestMove();
 
 void setup()
 {
-    MoveForward(0.75);
+    Serial.begin(115200);
+    Serial.setTimeout(400);
+    for (int i = 2; i <= 13; i++)
+    {
+        pinMode(i, OUTPUT);
+    }
+
+    OLED_INIT();
+    MECANUM_WHEEL_INIT();
+    //TestMove();
 }
 
 void loop()
 {
+    if (Serial.available())
+    {
+        String serial_cmd = Serial.readStringUntil('\n');
+        PrintSerial(serial_cmd);
+        HandleCmd(serial_cmd);
+    }
+}
+
+void HandleCmd(String cmd)
+{
+    if (cmd.startsWith("Obstacles"))
+    {
+        MoveBackForObstacles();
+    }
+    else if (cmd.startsWith("MoveX:"))
+    {
+        // MoveX:1:1:0.872
+        String dx = cmd.substring(6, 7);
+        String dy = cmd.substring(8, 9);
+        float speedPer = cmd.substring(10, cmd.length() - 1).toFloat();
+        DIRECTION motionX = dx.equals("1") ? FRONT : BACK;
+        DIRECTION motionY = dx.equals("1") ? FRONT : BACK;
+        MoveX(motionX, motionY, speedPer);
+    }
+    else if (cmd.startsWith("Request Go"))
+    {
+        MoveForward(0.6);
+    }
+    else if (cmd.startsWith("Request Back"))
+    {
+        MoveBackward(0.6);
+    }
+    else if (cmd.startsWith("Request Left"))
+    {
+        TurnLeft(0.08);
+    }
+    else if (cmd.startsWith("Request Right"))
+    {
+        TurnRight(0.08);
+    }
+    else if (cmd.startsWith("Request Stop"))
+    {
+        Stop();
+    }
+    else if (cmd.startsWith("MoveLeft:"))
+    {
+        float speedPer = cmd.substring(9, cmd.length() - 1).toFloat();
+        MoveLeft(speedPer);
+    }
+    else if (cmd.startsWith("MoveRight:"))
+    {
+        float speedPer = cmd.substring(10, cmd.length() - 1).toFloat();
+        MoveRight(speedPer);
+    }
 }

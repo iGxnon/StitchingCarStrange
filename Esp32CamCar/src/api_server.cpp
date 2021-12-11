@@ -2,18 +2,17 @@
 #include "ESPAsyncWebServer.h"
 #include "esp_camera.h"
 
-
 AsyncWebServer server_80(80);
 AsyncWebServer server_82(82);
 AsyncWebServer server_83(83);
 
 extern String WiFiAddr;
 extern int LEDIO;
-extern void WheelDriver();
 
 // port 80
 
-void handleRoot(AsyncWebServerRequest *request) {
+void handleRoot(AsyncWebServerRequest *request)
+{
   AsyncResponseStream *response = request->beginResponseStream("text/html");
   response->print("<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0\">\n");
   response->print("<script>var xhttp = new XMLHttpRequest();</script>");
@@ -33,55 +32,62 @@ void handleRoot(AsyncWebServerRequest *request) {
   request->send(response);
 }
 
-void handleGo(AsyncWebServerRequest *request) {
+void handleGo(AsyncWebServerRequest *request)
+{
   Serial.println("Request Go");
   request->send(200);
 }
 
-void handleBack(AsyncWebServerRequest *request) {
+void handleBack(AsyncWebServerRequest *request)
+{
   Serial.println("Request Back");
   request->send(200);
 }
 
-void handleLeft(AsyncWebServerRequest *request) {
+void handleLeft(AsyncWebServerRequest *request)
+{
   Serial.println("Request Left");
   request->send(200);
 }
 
-void handleRight(AsyncWebServerRequest *request) {
+void handleRight(AsyncWebServerRequest *request)
+{
   Serial.println("Request Right");
   request->send(200);
 }
 
-void handleStop(AsyncWebServerRequest *request) {
+void handleStop(AsyncWebServerRequest *request)
+{
   Serial.println("Request Stop");
   request->send(200);
 }
 
-void handleLedOn(AsyncWebServerRequest *request) {
+void handleLedOn(AsyncWebServerRequest *request)
+{
   Serial.println("Request LedOn");
   digitalWrite(LEDIO, HIGH);
   request->send(200);
 }
 
-void handleLedOff(AsyncWebServerRequest *request) {
+void handleLedOff(AsyncWebServerRequest *request)
+{
   Serial.println("Request LedOff");
   digitalWrite(LEDIO, LOW);
   request->send(200);
 }
 
-
 // port 82
 
-void handleTestConn(AsyncWebServerRequest *request) {
+void handleTestConn(AsyncWebServerRequest *request)
+{
   Serial.println("Request TestConn");
   request->send(200);
 }
 
+void handleStatus(AsyncWebServerRequest *request)
+{
 
-void handleStatus(AsyncWebServerRequest *request) {
-
-  sensor_t * s = esp_camera_sensor_get();
+  sensor_t *s = esp_camera_sensor_get();
   AsyncResponseStream *response = request->beginResponseStream("application/json");
   response->addHeader("Access-Control-Allow-Origin", "*");
   response->print("{");
@@ -112,174 +118,198 @@ void handleStatus(AsyncWebServerRequest *request) {
   request->send(response);
 }
 
-
-void handleControl(AsyncWebServerRequest *request) {
-  sensor_t * s = esp_camera_sensor_get();
+void handleControl(AsyncWebServerRequest *request)
+{
+  sensor_t *s = esp_camera_sensor_get();
   int res = 0;
   int cnt = 0;
 
   AsyncWebParameter *p = NULL;
-  if (request->hasParam("quality", true)) {  //Check if POST (but not File) parameter exists
+  if (request->hasParam("quality", true))
+  { //Check if POST (but not File) parameter exists
     p = request->getParam("quality", true);
     res = s->set_quality(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("contrast", true)) {
+  if (request->hasParam("contrast", true))
+  {
     p = request->getParam("contrast", true);
     res = s->set_contrast(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("brightness", true)) {
+  if (request->hasParam("brightness", true))
+  {
     p = request->getParam("brightness", true);
     res = s->set_brightness(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("saturation", true)) {
+  if (request->hasParam("saturation", true))
+  {
     p = request->getParam("saturation", true);
     res = s->set_saturation(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("gainceiling", true)) {
+  if (request->hasParam("gainceiling", true))
+  {
     p = request->getParam("gainceiling", true);
     res = s->set_gainceiling(s, (gainceiling_t)atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("colorbar", true)) {
+  if (request->hasParam("colorbar", true))
+  {
     p = request->getParam("colorbar", true);
     res = s->set_colorbar(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("awb", true)) {
+  if (request->hasParam("awb", true))
+  {
     p = request->getParam("awb", true);
     res = s->set_whitebal(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("agc", true)) {
+  if (request->hasParam("agc", true))
+  {
     p = request->getParam("agc", true);
     res = s->set_gain_ctrl(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("aec", true)) {
+  if (request->hasParam("aec", true))
+  {
     p = request->getParam("aec", true);
     res = s->set_exposure_ctrl(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("hmirror", true)) {
+  if (request->hasParam("hmirror", true))
+  {
     p = request->getParam("hmirror", true);
     res = s->set_hmirror(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("vflip", true)) {
+  if (request->hasParam("vflip", true))
+  {
     p = request->getParam("vflip", true);
     res = s->set_vflip(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("awb_gain", true)) {
+  if (request->hasParam("awb_gain", true))
+  {
     p = request->getParam("awb_gain", true);
     res = s->set_awb_gain(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-
-  if (request->hasParam("agc_gain", true)) {
+  if (request->hasParam("agc_gain", true))
+  {
     p = request->getParam("agc_gain", true);
     res = s->set_agc_gain(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("aec_value", true)) {
+  if (request->hasParam("aec_value", true))
+  {
     p = request->getParam("aec_value", true);
     res = s->set_aec_value(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("aec2", true)) {
+  if (request->hasParam("aec2", true))
+  {
     p = request->getParam("aec2", true);
     res = s->set_aec2(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("dcw", true)) {
+  if (request->hasParam("dcw", true))
+  {
     p = request->getParam("dcw", true);
     res = s->set_dcw(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("bpc", true)) {
+  if (request->hasParam("bpc", true))
+  {
     p = request->getParam("bpc", true);
     res = s->set_bpc(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("wpc", true)) {
+  if (request->hasParam("wpc", true))
+  {
     p = request->getParam("wpc", true);
     res = s->set_wpc(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("raw_gma", true)) {
+  if (request->hasParam("raw_gma", true))
+  {
     p = request->getParam("raw_gma", true);
     res = s->set_raw_gma(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("lenc", true)) {
+  if (request->hasParam("lenc", true))
+  {
     p = request->getParam("aec2", true);
     res = s->set_lenc(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("special_effect", true)) {
+  if (request->hasParam("special_effect", true))
+  {
     p = request->getParam("special_effect", true);
     res = s->set_special_effect(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("wb_mode", true)) {
+  if (request->hasParam("wb_mode", true))
+  {
     p = request->getParam("wb_mode", true);
     res = s->set_wb_mode(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-  if (request->hasParam("ae_level", true)) {
+  if (request->hasParam("ae_level", true))
+  {
     p = request->getParam("ae_level", true);
     res = s->set_ae_level(s, atoi(p->value().c_str()));
-    cnt ++;
+    cnt++;
   }
 
-
-  if (res || cnt == 0) {
+  if (res || cnt == 0)
+  {
     Serial.printf("Camera control failed");
     request->send(500);
   }
   request->send(200);
 }
 
-
-void handleCapture(AsyncWebServerRequest *request) {
+void handleCapture(AsyncWebServerRequest *request)
+{
   Serial.println("Request Capture");
   int64_t fr_start = esp_timer_get_time();
 
-  camera_fb_t * fb = esp_camera_fb_get();
-  if (!fb) {
+  camera_fb_t *fb = esp_camera_fb_get();
+  if (!fb)
+  {
     Serial.printf("Camera capture failed");
     request->send(500);
   }
   int fb_len = fb->len;
   AsyncResponseStream *response = request->beginResponseStream("image/jpeg");
   response->addHeader("Content-Disposition", "inline; filename=capture.jpg");
-  for (int i = 0; i < fb_len; i ++) {
+  for (int i = 0; i < fb_len; i++)
+  {
     response->print(((const char *)fb->buf)[i]);
   }
   request->send(response);
@@ -290,47 +320,42 @@ void handleCapture(AsyncWebServerRequest *request) {
 }
 
 // port 83
-// receive Map:
-// LF|RF|LB|RB_Direction: 1 (Forward)|0 (Back)
-// LF|RF|LB|RB_Speed: [0-100] (PWM signal)
-void handleAppMoveCmd(AsyncWebServerRequest *request) {
+// Recieved dx, dy
+void handleAppMoveCmd(AsyncWebServerRequest *request)
+{
   Serial.println("Request AppMoveCmd");
-  request->send(200);
+  if (request->hasParam("dx") && request->hasParam("dy"))
+  {
+    AsyncWebParameter *px = request->getParam("dx");
+    AsyncWebParameter *py = request->getParam("dy");
+    Serial.println("AppMove:" + px->value() + ":" + py->value());
+    request->send(200);
+    return;
+  }
+  request->send(500);
 }
 
-void startWebServer() {
+void startWebServer()
+{
   server_80.on("/", HTTP_GET, handleRoot);
 
   server_80.on("/go", HTTP_GET, handleGo);
   server_80.on("/back", HTTP_GET, handleBack);
   server_80.on("/left", HTTP_GET, handleLeft);
   server_80.on("/right", HTTP_GET, handleRight);
+  server_80.on("/stop", HTTP_GET, handleStop);
 
   server_80.on("/ledon", HTTP_GET, handleLedOn);
   server_80.on("/ledoff", HTTP_GET, handleLedOff);
-
-
 
   server_82.on("/test", HTTP_GET, handleTestConn);
   server_82.on("/capture", HTTP_GET, handleCapture);
   server_82.on("/status", HTTP_GET, handleStatus);
   server_82.on("/control", HTTP_POST, handleControl);
 
-
-
   server_83.on("/move", HTTP_POST, handleAppMoveCmd);
 
   server_80.begin(); //启动服务器
-  Serial.println("\nWeb server on port 80 started");
-
   server_82.begin();
-  Serial.println("Web server on port 82 started");
-
   server_83.begin();
-  Serial.println("Web server on port 83 started");
-
-}
-
-void WheelDriver() {
-
 }
