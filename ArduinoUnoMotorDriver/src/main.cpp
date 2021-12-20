@@ -24,12 +24,6 @@ int RB_BACKWARD = 13;
 int RB_PWM = 11;
 int RB_PWM_HIGH_IN = A3;
 
-typedef enum
-{
-    FRONT,
-    BACK,
-} DIRECTION;
-
 extern void
 MECANUM_WHEEL_INIT();
 
@@ -46,7 +40,7 @@ extern void ShowIP(String ip);
 extern void PrintSerial(String str);
 extern void HandleCmd(String cmd);
 extern void MoveBackForObstacles();
-extern void MoveX(DIRECTION dx, DIRECTION dy, float speedPer);
+extern void MoveX(int dx, int dy, float speedPer);
 
 void TestMove();
 
@@ -82,13 +76,16 @@ void HandleCmd(String cmd)
     }
     else if (cmd.startsWith("MoveX:"))
     {
-        // MoveX:1:1:0.872
-        String dx = cmd.substring(6, 7);
-        String dy = cmd.substring(8, 9);
+        // MoveX:[dx]:[dy]:[dutyRadio]
+        int dx = cmd.substring(6, 7).toInt();
+        int dy = cmd.substring(8, 9).toInt();
+        if (dx == -1 || dy == -1)
+        {
+            Stop();
+            return;
+        }
         float speedPer = cmd.substring(10, cmd.length() - 1).toFloat();
-        DIRECTION motionX = dx.equals("1") ? FRONT : BACK;
-        DIRECTION motionY = dx.equals("1") ? FRONT : BACK;
-        MoveX(motionX, motionY, speedPer);
+        MoveX(dx, dy, speedPer);
     }
     else if (cmd.startsWith("Request Go"))
     {
@@ -119,5 +116,31 @@ void HandleCmd(String cmd)
     {
         float speedPer = cmd.substring(10, cmd.length() - 1).toFloat();
         MoveRight(speedPer);
+    }
+    else if (cmd.startsWith("NormalMove:"))
+    {
+        // NormalMove:[code]:[dutyRatio]
+        String motion = cmd.substring(11, 12);
+        if (motion.equals("4"))
+        {
+            Stop();
+        }
+        float speedPer = cmd.substring(13, cmd.length() - 1).toFloat();
+        if (motion.equals("0"))
+        {
+            MoveForward(speedPer);
+        }
+        else if (motion.equals("1"))
+        {
+            MoveBackward(speedPer);
+        }
+        else if (motion.equals("2"))
+        {
+            TurnLeft(speedPer);
+        }
+        else if (motion.equals("3"))
+        {
+            TurnRight(speedPer);
+        }
     }
 }

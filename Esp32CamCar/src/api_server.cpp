@@ -18,13 +18,23 @@ void handleRoot(AsyncWebServerRequest *request)
   response->print("<script>var xhttp = new XMLHttpRequest();</script>");
   response->print("<script>function getsend(arg) { xhttp.open('GET', arg +'?' + new Date().getTime(), true); xhttp.send() } </script>");
   response->print("<p align=center><IMG SRC='http://" + WiFiAddr + ":81/stream' style='width:300px'></p><br/><br/>");
-  response->print("<p align=center> <button style=background-color:lightgrey;width:90px;height:80px onmousedown=getsend('go') onmouseup=getsend('stop') ontouchstart=getsend('go') ontouchend=getsend('stop') ><b>Forward</b></button> </p>");
   response->print("<p align=center>");
-  response->print("<button style=background-color:lightgrey;width:90px;height:80px; onmousedown=getsend('left') onmouseup=getsend('stop') ontouchstart=getsend('left') ontouchend=getsend('stop')><b>Left</b></button>&nbsp;");
-  response->print("<button style=background-color:indianred;width:90px;height:80px onmousedown=getsend('stop') onmouseup=getsend('stop')><b>Stop</b></button>&nbsp;");
-  response->print("<button style=background-color:lightgrey;width:90px;height:80px onmousedown=getsend('right') onmouseup=getsend('stop') ontouchstart=getsend('right') ontouchend=getsend('stop')><b>Right</b></button>");
+  response->print("<button style=background-color:lightgrey;width:90px;height:80px onmousedown=getsend('lf') onmouseup=getsend('stop') ontouchstart=getsend('lf') ontouchend=getsend('stop') ><b>LF</b></button>&nbsp;");
+  response->print("<button style=background-color:lightgrey;width:90px;height:80px onmousedown=getsend('go') onmouseup=getsend('stop') ontouchstart=getsend('go') ontouchend=getsend('stop') ><b>Forward</b></button>&nbsp;");
+  response->print("<button style=background-color:lightgrey;width:90px;height:80px onmousedown=getsend('rf') onmouseup=getsend('stop') ontouchstart=getsend('rf') ontouchend=getsend('stop') ><b>RF</b></button>");
   response->print("</p>");
-  response->print("<p align=center><button style=background-color:lightgrey;width:90px;height:80px onmousedown=getsend('back') onmouseup=getsend('stop') ontouchstart=getsend('back') ontouchend=getsend('stop') ><b>Backward</b></button></p>");
+  response->print("<p align=center>");
+  response->print("<button style=background-color:lightgrey;width:45px;height:80px; onmousedown=getsend('wleft') onmouseup=getsend('stop') ontouchstart=getsend('wleft') ontouchend=getsend('stop')><b>Left</b></button>&nbsp;");
+  response->print("<button style=background-color:lightgrey;width:45px;height:80px; onmousedown=getsend('left') onmouseup=getsend('stop') ontouchstart=getsend('left') ontouchend=getsend('stop')><b>Left</b></button>&nbsp;");
+  response->print("<button style=background-color:indianred;width:90px;height:80px onmousedown=getsend('stop') onmouseup=getsend('stop')><b>Stop</b></button>&nbsp;");
+  response->print("<button style=background-color:lightgrey;width:45px;height:80px onmousedown=getsend('right') onmouseup=getsend('stop') ontouchstart=getsend('right') ontouchend=getsend('stop')><b>Right</b></button>&nbsp;");
+  response->print("<button style=background-color:lightgrey;width:45px;height:80px; onmousedown=getsend('wright') onmouseup=getsend('stop') ontouchstart=getsend('wright') ontouchend=getsend('stop')><b>Right</b></button>");
+  response->print("</p>");
+  response->print("<p align=center>");
+  response->print("<button style=background-color:lightgrey;width:90px;height:80px onmousedown=getsend('lb') onmouseup=getsend('stop') ontouchstart=getsend('lb') ontouchend=getsend('stop') ><b>LF</b></button>&nbsp;");
+  response->print("<button style=background-color:lightgrey;width:90px;height:80px onmousedown=getsend('back') onmouseup=getsend('stop') ontouchstart=getsend('back') ontouchend=getsend('stop') ><b>Forward</b></button>&nbsp;");
+  response->print("<button style=background-color:lightgrey;width:90px;height:80px onmousedown=getsend('rb') onmouseup=getsend('stop') ontouchstart=getsend('rb') ontouchend=getsend('stop') ><b>RF</b></button>");
+  response->print("</p>");
   response->print("<p align=center>");
   response->print("<button style=background-color:yellow;width:140px;height:40px onmousedown=getsend('ledon')><b>Light ON</b></button>");
   response->print("<button style=background-color:yellow;width:140px;height:40px onmousedown=getsend('ledoff')><b>Light OFF</b></button>");
@@ -73,6 +83,42 @@ void handleLedOff(AsyncWebServerRequest *request)
 {
   Serial.println("Request LedOff");
   digitalWrite(LEDIO, LOW);
+  request->send(200);
+}
+
+void handleLFMove(AsyncWebServerRequest *request)
+{
+  Serial.println("MoveX:1:0:0.6");
+  request->send(200);
+}
+
+void handleLBMove(AsyncWebServerRequest *request)
+{
+  Serial.println("MoveX:1:1:0.6");
+  request->send(200);
+}
+
+void handleRFMove(AsyncWebServerRequest *request)
+{
+  Serial.println("MoveX:0:0:0.6");
+  request->send(200);
+}
+
+void handleRBMove(AsyncWebServerRequest *request)
+{
+  Serial.println("MoveX:0:1:0.6");
+  request->send(200);
+}
+
+void handleWLeftMove(AsyncWebServerRequest *request)
+{
+  Serial.println("MoveLeft:0.6");
+  request->send(200);
+}
+
+void handleWRightMove(AsyncWebServerRequest *request)
+{
+  Serial.println("MoveRight:0.6");
   request->send(200);
 }
 
@@ -320,40 +366,69 @@ void handleCapture(AsyncWebServerRequest *request)
 }
 
 // port 83
-// Recieved dx, dy
+// 由于esp32体质问题，已经废弃该方法
 void handleAppMoveCmd(AsyncWebServerRequest *request)
 {
   Serial.println("Request AppMoveCmd");
-  if (request->hasParam("dx") && request->hasParam("dy"))
+  if (request->hasParam("type") && request->hasParam("motion"))
   {
-    AsyncWebParameter *px = request->getParam("dx");
-    AsyncWebParameter *py = request->getParam("dy");
-    Serial.println("AppMove:" + px->value() + ":" + py->value());
-    request->send(200);
+    AsyncWebParameter *px = request->getParam("type");
+    AsyncWebParameter *py = request->getParam("motion");
+    AsyncWebParameter *pz = request->getParam("pwm");
+    if (px->value().equals("x_move"))
+    {
+      Serial.println("MoveX:" + py->value() + ":" + pz->value());
+    }
+    else if (px->value().equals("normal_move"))
+    {
+      Serial.println("NormalMove:" + py->value() + ":" + pz->value());
+    }
+    else if (px->value().equals("parallel_move"))
+    {
+      if (py->value().equals("2"))
+      {
+        Serial.println("MoveLeft:" + pz->value());
+      }
+      else if (py->value().equals("3"))
+      {
+        Serial.println("MoveRight:" + pz->value());
+      }
+      else
+      {
+        Serial.println("NormalMove:" + py->value() + ":" + pz->value());
+      }
+    }
+    request->send(200, "application/json", "{status: ok}");
     return;
   }
-  request->send(500);
+  request->send(500, "application/json", "{status: failed}");
 }
 
 void startWebServer()
 {
-  server_80.on("/", HTTP_GET, handleRoot);
+  server_80.on("/", HTTP_ANY, handleRoot);
 
-  server_80.on("/go", HTTP_GET, handleGo);
-  server_80.on("/back", HTTP_GET, handleBack);
-  server_80.on("/left", HTTP_GET, handleLeft);
-  server_80.on("/right", HTTP_GET, handleRight);
-  server_80.on("/stop", HTTP_GET, handleStop);
+  server_80.on("/go", HTTP_ANY, handleGo);
+  server_80.on("/back", HTTP_ANY, handleBack);
+  server_80.on("/left", HTTP_ANY, handleLeft);
+  server_80.on("/right", HTTP_ANY, handleRight);
+  server_80.on("/stop", HTTP_ANY, handleStop);
+  server_80.on("/lf", HTTP_ANY, handleLFMove);
+  server_80.on("/lb", HTTP_ANY, handleLBMove);
+  server_80.on("/rf", HTTP_ANY, handleRFMove);
+  server_80.on("/rb", HTTP_ANY, handleRBMove);
+  server_80.on("/wleft", HTTP_ANY, handleWLeftMove);
+  server_80.on("/wright", HTTP_ANY, handleWRightMove);
 
-  server_80.on("/ledon", HTTP_GET, handleLedOn);
-  server_80.on("/ledoff", HTTP_GET, handleLedOff);
+  server_80.on("/ledon", HTTP_ANY, handleLedOn);
+  server_80.on("/ledoff", HTTP_ANY, handleLedOff);
 
-  server_82.on("/test", HTTP_GET, handleTestConn);
-  server_82.on("/capture", HTTP_GET, handleCapture);
-  server_82.on("/status", HTTP_GET, handleStatus);
-  server_82.on("/control", HTTP_POST, handleControl);
+  server_82.on("/test", HTTP_ANY, handleTestConn);
+  server_82.on("/capture", HTTP_ANY, handleCapture);
+  server_82.on("/status", HTTP_ANY, handleStatus);
+  server_82.on("/control", HTTP_ANY, handleControl);
 
-  server_83.on("/move", HTTP_POST, handleAppMoveCmd);
+  server_83.on("/move", HTTP_ANY, handleAppMoveCmd);
 
   server_80.begin(); //启动服务器
   server_82.begin();

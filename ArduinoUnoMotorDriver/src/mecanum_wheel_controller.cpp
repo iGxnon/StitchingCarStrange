@@ -29,8 +29,8 @@ typedef enum
 
 #define POWER_LF 1.0
 #define POWER_RF 1.0
-#define POWER_LB 0.80
-#define POWER_RB 0.80
+#define POWER_LB 1.0
+#define POWER_RB 1.0
 
 // 麦轮运动学公式
 #define _A_ 10
@@ -207,7 +207,7 @@ void MoveLeft(float speedPer)
 }
 
 // X 形状移动
-void MoveX(DIRECTION dx, DIRECTION dy, float speedPer)
+void MoveX(int dx, int dy, float speedPer)
 {
     if (dx == FRONT)
     {
