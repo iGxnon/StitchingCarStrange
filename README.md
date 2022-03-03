@@ -1,3 +1,3 @@
-![](https://gitee.com/iGxnon/image-host/raw/master/pic-go/缝合小车怪.png)
+![](https://image-1259160349.cos.ap-chengdu.myqcloud.com/img/cargogogo.webp)
 
 > and 三连禁止
