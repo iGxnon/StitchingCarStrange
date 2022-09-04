@@ -1,3 +1,3 @@
-![](https://image-1259160349.cos.ap-chengdu.myqcloud.com/img/cargogogo.webp)
+<img src="https://img.skygard.cn/cargogogo.webp"/>
 
 > and 三连禁止
